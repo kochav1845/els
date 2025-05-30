@@ -5,7 +5,7 @@ import { encode } from 'https://esm.sh/gpt-tokenizer@2.1.2'
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Max-Age': '86400',
 }
 
@@ -111,6 +111,7 @@ function truncateMessages(messages: any[]): any[] {
 }
 
 serve(async (req) => {
+  
   const requestId = crypto.randomUUID()
   
   if (req.method === 'OPTIONS') {
