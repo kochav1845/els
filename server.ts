@@ -113,10 +113,12 @@ function truncateMessages(messages: any[]): any[] {
 serve(async (req) => {
   
   const requestId = crypto.randomUUID()
-  
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
+  return new Response(null, {
+    status: 204,
+    headers: corsHeaders
+  });
+}
 
   try {
     const openAiKey = Deno.env.get('OPENAI_API_KEY')
