@@ -1,51 +1,45 @@
-import { Handler } from '@netlify/functions';
-import OpenAI from 'openai';
+import { serve } from 'https://deno.land/std@0.210.0/http/server.ts';
+import OpenAI from 'https://esm.sh/openai@4.29.1';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: Deno.env.get("OPENAI_API_KEY"),
 });
 
-export const handler: Handler = async (event) => {
-  // Only allow POST requests
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: 'Method not allowed' }),
-    };
+serve(async (req) => {
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 
   try {
-    const { messages, torahTextUrl } = JSON.parse(event.body || '{}');
+    const { messages, torahTextUrl } = await req.json();
 
-    if (!messages || !Array.isArray(messages)) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Invalid messages format' }),
-      };
+    let torahText = '';
+    if (torahTextUrl) {
+      const torahRes = await fetch(torahTextUrl);
+      torahText = await torahRes.text();
     }
 
-    // Add Torah text URL to system message if not present
-    if (messages[0].role === 'system') {
-      messages[0].content += `\nTorah text source: ${torahTextUrl}`;
-    }
+    messages[0].content += `\nTorah Text Sample:\n${torahText.slice(0, 10000)}`;
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4',
       messages,
-      temperature: 0.7,
+      temperature: 0.7
     });
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: completion.data.choices[0].message?.content || 'No response generated',
-      }),
-    };
-  } catch (error) {
-    console.error('Error:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Internal server error' }),
-    };
+    return new Response(JSON.stringify({
+      message: completion.choices[0].message?.content
+    }), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
-};
+});
