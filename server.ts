@@ -114,11 +114,13 @@ serve(async (req) => {
   
   const requestId = crypto.randomUUID()
   if (req.method === 'OPTIONS') {
+    console.log('received preloght')
   return new Response(null, {
     status: 204,
     headers: corsHeaders
   });
-}
+}else{console.log('received other method')}
+  
 
   try {
     const openAiKey = Deno.env.get('OPENAI_API_KEY')
