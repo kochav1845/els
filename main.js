@@ -247,7 +247,7 @@ bookingForm.addEventListener('submit', (e) => {
 
 submit
  const response = JSON.parse(xhr.responseText);
-    if (response == 'success') {
+     {
       
      messageSuccess();
       submitButton.disabled = false;
@@ -259,7 +259,7 @@ submit
       phone.value = '';
       
       
-    } else {
+   
     
     }
     submitButton.innerHTML = 'submit request';
