@@ -260,7 +260,7 @@ submit
       
       
     } else {
-      alert('Something went wrong');
+    
     }
     submitButton.innerHTML = 'submit request';
     submitButtonBackground.style.background  ="#6366f1" ;
